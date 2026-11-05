@@ -43,3 +43,29 @@ void print_ast(Node *n, int depth) {
     for (int i = 0; i < n->nkids; i++)
         print_ast(n->kids[i], depth + 1);
 }
+static void json_escape(const char *s) {
+    for (; *s; s++) {
+        if (*s == '"' || *s == '\\') putchar('\\');
+        putchar(*s);
+    }
+}
+
+void print_json(Node *n) {
+    if (!n) return;
+    printf("{\"type\":\"%s\"", node_type_name(n->type));
+    if (n->type == N_NUM) printf(",\"label\":\"%d\"", n->num);
+    else if (n->str) {
+        printf(",\"label\":\"");
+        json_escape(n->str);
+        printf("\"");
+    }
+    if (n->nkids) {
+        printf(",\"children\":[");
+        for (int i = 0; i < n->nkids; i++) {
+            if (i) putchar(',');
+            print_json(n->kids[i]);
+        }
+        printf("]");
+    }
+    printf("}");
+}

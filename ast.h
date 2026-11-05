@@ -21,5 +21,6 @@ Node *new_node(NodeType type, const char *str, int num);
 Node *add_kid(Node *parent, Node *kid);
 const char *node_type_name(NodeType t);
 void print_ast(Node *n, int depth);
+void print_json(Node *n);
 
 #endif
