@@ -1,0 +1,9 @@
+parser.tab.c
+parser.tab.h
+parser.output
+lex.yy.c
+calc
+lexer
+*.bak
+err.txt
+out*.py

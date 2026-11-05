@@ -1,6 +1,7 @@
 %code requires {
     #include "ast.h"
     #include "interp.h"
+    #include "codegen.h"
 }
 
 %{
@@ -147,13 +148,15 @@ void yyerror(const char *s) {
 }
 
 int main(int argc, char **argv) {
-    int show_ast = 0, run = 1;
+    int show_ast = 0, run = 1, py = 0;
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--ast") == 0)    show_ast = 1;
         if (strcmp(argv[i], "--no-run") == 0) run = 0;
+        if (strcmp(argv[i], "--py") == 0)     { py = 1; run = 0; }
     }
     if (yyparse() != 0) return 1;
     if (show_ast) print_ast(root, 0);
+    if (py) generate_python(root, stdout);
     if (run) return interpret(root);
     return 0;
 }
