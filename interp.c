@@ -4,7 +4,7 @@
 #include "ast.h"
 #include "interp.h"
 
-/* ---------- Середовища (області видимості) ---------- */
+/* Середовища (області видимості) */
 typedef struct Var {
     char *name;
     int val;
@@ -19,7 +19,7 @@ typedef struct Env {
 static Env *global_env;
 static Node *funcs[256];
 static int nfuncs = 0;
-static int ret_val = 0;   /* значення, яке повернув останній return */
+static int ret_val = 0;
 
 static Env *env_new(Env *parent) {
     Env *e = calloc(1, sizeof(Env));
@@ -59,21 +59,19 @@ static void rt_error(Node *n, const char *msg, const char *name) {
     exit(1);
 }
 
-/* ---------- Прототипи ---------- */
+/* Прототипи */
 static int eval(Node *n, Env *e);
 static int exec(Node *n, Env *e);
 
-/* ---------- Виклик функції ---------- */
+/* Виклик функції */
 static int call_function(Node *call, Env *e) {
     int nargs = call->nkids;
     int args[32];
     if (nargs > 32) rt_error(call, "забагато аргументів у виклику", call->str);
 
-    /* аргументи обчислюємо в середовищі того, хто викликає */
     for (int i = 0; i < nargs; i++)
         args[i] = eval(call->kids[i], e);
 
-    /* вбудована функція print */
     if (strcmp(call->str, "print") == 0) {
         if (nargs != 1) rt_error(call, "print приймає 1 аргумент", NULL);
         printf("%d\n", args[0]);
@@ -90,7 +88,6 @@ static int call_function(Node *call, Env *e) {
     if (params->nkids != nargs)
         rt_error(call, "невірна кількість аргументів для", call->str);
 
-    /* нове середовище функції: батько = глобальне, а не середовище викликача */
     Env *fenv = env_new(global_env);
     for (int i = 0; i < nargs; i++)
         env_declare(fenv, params->kids[i]->str, args[i]);
@@ -102,7 +99,7 @@ static int call_function(Node *call, Env *e) {
     return result;
 }
 
-/* ---------- Обчислення виразів ---------- */
+/* Обчислення виразів */
 static int eval(Node *n, Env *e) {
     switch (n->type) {
     case N_NUM:
@@ -148,7 +145,7 @@ static int eval(Node *n, Env *e) {
     return 0;
 }
 
-/* ---------- Виконання операторів ---------- */
+/* Виконання операторів */
 /* повертає 1, якщо виконано return */
 static int exec(Node *n, Env *e) {
     switch (n->type) {
@@ -192,13 +189,13 @@ static int exec(Node *n, Env *e) {
         ret_val = eval(n->kids[0], e);
         return 1;
     case N_FUNC:
-        return 0;   /* функції реєструються окремо */
+        return 0;   
     default:
         return 0;
     }
 }
 
-/* ---------- Точка входу ---------- */
+/* Точка входу  */
 int interpret(Node *root) {
     global_env = env_new(NULL);
 
